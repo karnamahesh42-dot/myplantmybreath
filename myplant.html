@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Plant, My Breath — Demo</title>
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    :root{
+      --accent: #2e7d32; /* green */
+      --muted: #6c757d;
+      --card-radius: 16px;
+    }
+    body{
+      background: linear-gradient(180deg,#f6fff5 0%, #e9f8ee 100%);
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      -webkit-font-smoothing:antialiased;
+      padding: 18px;
+    }
+
+    /* Container width tuned for demo (mobile card UI) */
+    .app-wrap{
+      max-width:420px;
+      margin: 10px auto 60px;
+    }
+
+    .card-app{
+      border: none;
+      border-radius: var(--card-radius);
+      box-shadow: 0 8px 30px rgba(46,125,50,0.08);
+      overflow: hidden;
+    }
+
+    .app-header{
+      background: linear-gradient(90deg, rgba(46,125,50,1) 0%, rgba(16,124,64,1) 100%);
+      color: #fff;
+      padding: 18px 16px;
+    }
+    .app-header h5{margin:0;font-weight:700}
+    .app-header p{margin:0;font-size:13px;opacity:.95}
+
+    .section{padding:16px}
+
+    .profile-avatar{
+      width:84px;height:84px;border-radius:50%;overflow:hidden;border:4px solid #fff;box-shadow:0 6px 18px rgba(0,0,0,.06);
+    }
+    .avatar-placeholder{display:flex;align-items:center;justify-content:center;height:100%;background:#fff;color:var(--accent);font-weight:700}
+
+    .form-control:focus{box-shadow:none;border-color:var(--accent)}
+
+    .icon-label{display:inline-flex;align-items:center;gap:8px}
+    .icon-label i{font-size:18px;color:var(--accent)}
+
+    /* Card list for tasks */
+    .upload-card{border-radius:12px;border:1px dashed rgba(46,125,50,.12);padding:12px}
+    .thumbs{display:flex;gap:8px;flex-wrap:wrap}
+    .thumb{width:84px;height:84px;border-radius:8px;overflow:hidden;border:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;background:#fff}
+    .thumb img{width:100%;height:100%;object-fit:cover}
+
+    .btn-accent{background:var(--accent);border:none;color:#fff}
+    .btn-accent:active,.btn-accent:focus{box-shadow:none}
+
+    .small-muted{font-size:13px;color:var(--muted)}
+
+    /* responsive for small phones */
+    @media (max-width:420px){
+      .app-wrap{padding:0 6px}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-wrap">
+    <div class="card card-app">
+      <div class="app-header d-flex align-items-center justify-content-between">
+        <div>
+          <h5>My Plant, My Breath</h5>
+          <p class="mb-0">Plant at least 3 — Share your plantation photos</p>
+        </div>
+        <div class="text-end">
+          <button id="btnOpenProfile" class="btn btn-sm btn-light" title="Profile"><i class="fa-regular fa-user"></i></button>
+        </div>
+      </div>
+
+      <div id="mainArea" class="section">
+        <!-- Login / Register area -->
+        <div id="loginView">
+          <div class="text-center mb-3">
+            <div class="profile-avatar mx-auto mb-2" id="loginAvatar">
+              <div class="avatar-placeholder"><i class="fa-solid fa-seedling fa-2x"></i></div>
+            </div>
+            <div class="small-muted">Welcome to the demo. Login with mobile to continue.</div>
+          </div>
+
+          <form id="loginForm">
+            <div class="mb-3">
+              <label class="icon-label small-muted"><i class="fa-solid fa-phone"></i> Mobile Number</label>
+              <input type="tel" id="loginMobile" class="form-control" placeholder="Enter mobile number" pattern="[0-9]{10}" required>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-accent">Login</button>
+              <button type="button" id="btnGoRegister" class="btn btn-outline-success">Register new user</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Registration -->
+        <div id="registerView" style="display:none">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="profile-avatar" id="regAvatarPreview">
+              <div class="avatar-placeholder">+</div>
+            </div>
+            <div class="w-100">
+              <label class="small-muted mb-1">Upload Profile Photo</label>
+              <input type="file" id="profilePic" accept="image/*" class="form-control form-control-sm">
+            </div>
+          </div>
+
+          <form id="registerForm">
+            <div class="mb-2">
+              <label class="icon-label small-muted"><i class="fa-solid fa-user"></i> Name</label>
+              <input type="text" id="regName" class="form-control" placeholder="Full name" required>
+            </div>
+            <div class="mb-2">
+              <label class="icon-label small-muted"><i class="fa-solid fa-phone"></i> Mobile</label>
+              <input type="tel" id="regMobile" class="form-control" placeholder="10 digit mobile" pattern="[0-9]{10}" required>
+            </div>
+            <div class="row">
+              <div class="col-6 mb-2">
+                <label class="icon-label small-muted"><i class="fa-solid fa-house"></i> Village</label>
+                <input type="text" id="regVillage" class="form-control" placeholder="Village" required>
+              </div>
+              <div class="col-6 mb-2">
+                <label class="icon-label small-muted"><i class="fa-solid fa-location-dot"></i> Pincode</label>
+                <input type="text" id="regPincode" class="form-control" placeholder="Pincode" pattern="[0-9]{6}" required>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="icon-label small-muted"><i class="fa-solid fa-flag"></i> State</label>
+              <input type="text" id="regState" class="form-control" placeholder="State" required>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button class="btn btn-accent" type="submit">Register & Login</button>
+              <button type="button" id="btnBackLogin" class="btn btn-outline-secondary">Back to Login</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Dashboard when logged in -->
+        <div id="dashboardView" style="display:none">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="profile-avatar" id="dashAvatar"></div>
+            <div>
+              <div id="dashName" style="font-weight:600"></div>
+              <div class="small-muted" id="dashMobile"></div>
+            </div>
+            <div class="ms-auto text-end">
+              <button id="btnLogout" class="btn btn-sm btn-light" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="upload-card">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <div>
+                  <div style="font-weight:700">Upload Plantation Photos</div>
+                  <div class="small-muted">Take and upload 3 photos of your plantation</div>
+                </div>
+                <div class="small-muted" id="progressCount">0/3</div>
+              </div>
+
+              <div class="mb-2">
+                <input type="file" id="plantFiles" accept="image/*" multiple class="form-control form-control-sm">
+              </div>
+
+              <div class="thumbs mb-2" id="thumbsWrap"></div>
+
+              <div class="d-grid gap-2">
+                <button id="btnSubmitTask" class="btn btn-accent" disabled>Submit Task</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-2 small-muted">Tip: You can upload images from your phone camera or gallery. This is a static demo — images are stored in browser only.</div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="text-center mt-3 small-muted">Demo build • No backend • LocalStorage saves demo user</div>
+  </div>
+
+<script>
+  // Simple static demo logic using localStorage
+  const LS_USER_PREFIX = 'mpmb_user_';
+  const LS_LOGGED = 'mpmb_logged_mobile';
+
+  const $ = selector => document.querySelector(selector);
+  const $$ = selector => document.querySelectorAll(selector);
+
+  // Elements
+  const loginView = $('#loginView');
+  const registerView = $('#registerView');
+  const dashboardView = $('#dashboardView');
+
+  const loginForm = $('#loginForm');
+  const loginMobile = $('#loginMobile');
+  const btnGoRegister = $('#btnGoRegister');
+
+  const registerForm = $('#registerForm');
+  const regName = $('#regName');
+  const regMobile = $('#regMobile');
+  const regVillage = $('#regVillage');
+  const regState = $('#regState');
+  const regPincode = $('#regPincode');
+  const profilePic = $('#profilePic');
+  const regAvatarPreview = $('#regAvatarPreview');
+
+  const dashAvatar = $('#dashAvatar');
+  const dashName = $('#dashName');
+  const dashMobile = $('#dashMobile');
+  const btnLogout = $('#btnLogout');
+
+  const plantFiles = $('#plantFiles');
+  const thumbsWrap = $('#thumbsWrap');
+  const btnSubmitTask = $('#btnSubmitTask');
+  const progressCount = $('#progressCount');
+
+  const btnOpenProfile = $('#btnOpenProfile');
+  const loginAvatar = $('#loginAvatar');
+
+  // helper: read file as dataURL
+  function fileToDataURL(file){
+    return new Promise((res, rej) => {
+      const fr = new FileReader();
+      fr.onload = () => res(fr.result);
+      fr.onerror = () => rej();
+      fr.readAsDataURL(file);
+    });
+  }
+
+  // show view helpers
+  function showLogin(){ loginView.style.display=''; registerView.style.display='none'; dashboardView.style.display='none'; }
+  function showRegister(){ loginView.style.display='none'; registerView.style.display=''; dashboardView.style.display='none'; }
+  function showDashboard(){ loginView.style.display='none'; registerView.style.display='none'; dashboardView.style.display=''; }
+
+  // Load user if logged
+  function getLoggedMobile(){ return localStorage.getItem(LS_LOGGED); }
+  function setLoggedMobile(mobile){ localStorage.setItem(LS_LOGGED, mobile); }
+  function clearLogged(){ localStorage.removeItem(LS_LOGGED); }
+
+  function saveUser(mobile, userObj){ localStorage.setItem(LS_USER_PREFIX + mobile, JSON.stringify(userObj)); }
+  function getUser(mobile){ const j = localStorage.getItem(LS_USER_PREFIX + mobile); return j? JSON.parse(j): null; }
+
+  // Initialize
+  function init(){
+    const logged = getLoggedMobile();
+    if(logged && getUser(logged)){
+      populateDashboard(logged);
+      showDashboard();
+    } else showLogin();
+  }
+
+  // Login form submit
+  loginForm.addEventListener('submit', (e) =>{
+    e.preventDefault();
+    const mobile = loginMobile.value.trim();
+    if(!/^[0-9]{10}$/.test(mobile)){
+      Swal.fire('Invalid','Enter a valid 10 digit mobile number','warning');
+      return;
+    }
+    const user = getUser(mobile);
+    if(!user){
+      Swal.fire({
+        title: 'Not registered',
+        text: 'No user found with this mobile. Register now?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Register'
+      }).then(r => { if(r.isConfirmed) showRegister(); });
+      return;
+    }
+    setLoggedMobile(mobile);
+    populateDashboard(mobile);
+    showDashboard();
+    Swal.fire({icon:'success',title:'Logged In',toast:true,position:'top-end',showConfirmButton:false,timer:1200});
+  });
+
+  btnGoRegister.addEventListener('click', ()=>{
+    showRegister();
+  });
+
+  // Register image preview
+  profilePic.addEventListener('change', async (ev)=>{
+    const f = ev.target.files[0];
+    if(!f) return;
+    if(!f.type.startsWith('image/')) return;
+    const data = await fileToDataURL(f);
+    regAvatarPreview.innerHTML = '<img src="'+data+'" style="width:100%;height:100%;object-fit:cover">';
+  });
+
+  // Register submit
+  registerForm.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const mobile = regMobile.value.trim();
+    if(!/^[0-9]{10}$/.test(mobile)){
+      Swal.fire('Invalid','Enter a valid 10 digit mobile number','warning');
+      return;
+    }
+    const user = {
+      name: regName.value.trim(),
+      mobile: mobile,
+      village: regVillage.value.trim(),
+      state: regState.value.trim(),
+      pincode: regPincode.value.trim(),
+      profile: null,
+      tasks: []
+    };
+    if(profilePic.files && profilePic.files[0]){
+      try{ user.profile = await fileToDataURL(profilePic.files[0]); }catch(e){}
+    }
+
+    saveUser(mobile, user);
+    setLoggedMobile(mobile);
+    populateDashboard(mobile);
+    showDashboard();
+    Swal.fire({icon:'success',title:'Registered',text:'You are now logged in',timer:1400,showConfirmButton:false});
+  });
+
+  // populate dashboard values
+  function populateDashboard(mobile){
+    const user = getUser(mobile);
+    if(!user) return;
+    dashName.textContent = user.name || '—';
+    dashMobile.textContent = user.mobile;
+    if(user.profile){
+      dashAvatar.innerHTML = '<img src="'+user.profile+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+      loginAvatar.innerHTML = '<img src="'+user.profile+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+    } else {
+      dashAvatar.innerHTML = '<div class="avatar-placeholder"><i class="fa-solid fa-user"></i></div>';
+      loginAvatar.innerHTML = '<div class="avatar-placeholder"><i class="fa-solid fa-seedling fa-2x"></i></div>';
+    }
+
+    // load tasks
+    renderThumbs(user.tasks || []);
+  }
+
+  // logout
+  btnLogout.addEventListener('click', ()=>{
+    clearLogged();
+    showLogin();
+    Swal.fire({icon:'success',title:'Logged out',toast:true,position:'top-end',showConfirmButton:false,timer:900});
+  });
+
+  // plant file change
+  plantFiles.addEventListener('change', async (ev)=>{
+    const files = Array.from(ev.target.files).filter(f=>f.type.startsWith('image/'));
+    if(files.length === 0) return;
+    // limit total to 3 -- keep last 3
+    const mobile = getLoggedMobile(); if(!mobile) { Swal.fire('Login required','Please login first','warning'); return; }
+    const user = getUser(mobile) || {tasks:[]};
+
+    // read files to data urls
+    for(const f of files){
+      if(user.tasks.length >= 3) break;
+      try{ const d = await fileToDataURL(f); user.tasks.push(d); }catch(e){}
+    }
+    // save
+    saveUser(mobile, user);
+    populateDashboard(mobile);
+    // reset input
+    plantFiles.value = '';
+
+    if((user.tasks||[]).length >= 3) btnSubmitTask.disabled = false;
+  });
+
+  // render thumbs
+  function renderThumbs(tasks){
+    thumbsWrap.innerHTML = '';
+    const arr = tasks||[];
+    progressCount.textContent = `${arr.length}/3`;
+    arr.forEach((d,i)=>{
+      const div = document.createElement('div'); div.className='thumb';
+      div.innerHTML = '<img src="'+d+'" alt="plant-'+(i+1)+'">';
+      // add remove button overlay
+      const rem = document.createElement('button');
+      rem.className = 'btn btn-sm';
+      rem.style.position='absolute'; rem.style.margin='-6px'; rem.style.right='4px'; rem.style.top='4px';
+      rem.innerHTML = '<i class="fa-solid fa-xmark" style="font-size:12px;color:#fff"></i>';
+      rem.style.background='rgba(0,0,0,.5)'; rem.style.border='none'; rem.style.borderRadius='50%';
+      rem.title='Remove';
+      rem.addEventListener('click', ()=>{
+        const mobile = getLoggedMobile(); const user = getUser(mobile); if(!user) return;
+        user.tasks.splice(i,1); saveUser(mobile,user); populateDashboard(mobile);
+      });
+      const wrapper = document.createElement('div'); wrapper.style.position='relative'; wrapper.appendChild(div); wrapper.appendChild(rem);
+      thumbsWrap.appendChild(wrapper);
+    });
+
+    // if less than 3, show placeholders up to 3
+    for(let i=arr.length;i<3;i++){
+      const ph = document.createElement('div'); ph.className='thumb'; ph.innerHTML = '<div style="font-size:22px;color:var(--muted)"><i class="fa-solid fa-image"></i></div>';
+      thumbsWrap.appendChild(ph);
+    }
+
+    btnSubmitTask.disabled = (arr.length < 3);
+  }
+
+  // submit task
+  btnSubmitTask.addEventListener('click', ()=>{
+    const mobile = getLoggedMobile(); if(!mobile){ Swal.fire('Login required','Please login first','warning'); return; }
+    const user = getUser(mobile);
+    if(!user || (user.tasks||[]).length < 3){ Swal.fire('Incomplete','Please upload 3 photos before submitting','warning'); return; }
+
+    // Mark as completed — we add a completed flag
+    user.completedAt = new Date().toISOString();
+    saveUser(mobile,user);
+
+    // Show congratulations popup with simple confetti effect via SweetAlert
+    Swal.fire({
+      title: 'Congratulations!',
+      html: `<div style="font-weight:600;">Thank you ${user.name || ''} — You have submitted 3 plantation photos.</div><div class="small-muted mt-2">Keep planting & breathing.</div>`,
+      icon: 'success',
+      confirmButtonText: 'OK'
+    });
+  });
+
+  // Quick profile open button: opens register form prefilled with current user
+  btnOpenProfile.addEventListener('click', ()=>{
+    const mobile = getLoggedMobile();
+    if(!mobile){ showLogin(); return; }
+    const user = getUser(mobile);
+    showRegister();
+    // prefill
+    regName.value = user.name || '';
+    regMobile.value = user.mobile || '';
+    regVillage.value = user.village || '';
+    regState.value = user.state || '';
+    regPincode.value = user.pincode || '';
+    if(user.profile) regAvatarPreview.innerHTML = '<img src="'+user.profile+'" style="width:100%;height:100%;object-fit:cover">';
+  });
+
+  // back to login
+  $('#btnBackLogin').addEventListener('click', ()=>{ showLogin(); });
+
+  // small UX: if user enters mobile in register page, prefill name if exists
+  regMobile.addEventListener('blur', ()=>{
+    const u = getUser(regMobile.value.trim()); if(u){ regName.value = u.name || regName.value; regVillage.value = u.village || regVillage.value; regState.value = u.state || regState.value; regPincode.value = u.pincode || regPincode.value; if(u.profile) regAvatarPreview.innerHTML = '<img src="'+u.profile+'" style="width:100%;height:100%;object-fit:cover">'; }
+  });
+
+  // init app
+  init();
+</script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
