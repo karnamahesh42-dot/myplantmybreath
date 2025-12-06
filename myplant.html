@@ -3,17 +3,20 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>My Plant, My Breath — Demo</title>
+  <title>Umar Alisha Rural Development Trust — My Plant, My Breath</title>
+
   <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- jsPDF for PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
     :root{
-      --accent: #2e7d32; /* green */
+      --accent: #2e7d32;
       --muted: #6c757d;
       --card-radius: 16px;
     }
@@ -24,7 +27,6 @@
       padding: 18px;
     }
 
-    /* Container width tuned for demo (mobile card UI) */
     .app-wrap{
       max-width:420px;
       margin: 10px auto 60px;
@@ -37,19 +39,41 @@
       overflow: hidden;
     }
 
-    .app-header{
-      background: linear-gradient(90deg, rgba(46,125,50,1) 0%, rgba(16,124,64,1) 100%);
-      color: #fff;
-      padding: 18px 16px;
+    /* Trust header (top) */
+    .trust-header{
+      background:#fff;
+      padding:12px 10px;
+      border-radius:12px;
+      text-align:center;
+      margin-bottom:12px;
+      box-shadow: 0 6px 20px rgba(46,125,50,0.03);
     }
-    .app-header h5{margin:0;font-weight:700}
-    .app-header p{margin:0;font-size:13px;opacity:.95}
+    .trust-logo{
+      height:68px;
+      display:block;
+      margin: 0 auto 6px;
+      object-fit:contain;
+    }
+    .trust-title{font-size:18px;font-weight:800;color:#1d5e29;margin:0}
+    .trust-slogan{font-size:12px;color:#4f6f52;margin-top:4px}
+    .trust-sub{font-size:11px;color:#2f6d2f;margin-top:4px;opacity:0.9}
+
+    .app-header{
+      background:linear-gradient(90deg, rgba(46,125,50,1) 0%, rgba(16,124,64,1) 100%);
+      color:#fff;
+      padding:14px 14px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .app-header .header-title { flex: 1; }
+    .app-header h5{margin:0;font-weight:700;font-size:16px}
+    .app-header p{margin:0;font-size:12px;opacity:.95}
+    .app-header .header-logo{height:36px;margin-left:8px;border-radius:6px;background:#fff;padding:4px;display:flex;align-items:center;justify-content:center}
 
     .section{padding:16px}
 
-    .profile-avatar{
-      width:84px;height:84px;border-radius:50%;overflow:hidden;border:4px solid #fff;box-shadow:0 6px 18px rgba(0,0,0,.06);
-    }
+    .profile-avatar{width:84px;height:84px;border-radius:50%;overflow:hidden;border:4px solid #fff;box-shadow:0 6px 18px rgba(0,0,0,.06);}
     .avatar-placeholder{display:flex;align-items:center;justify-content:center;height:100%;background:#fff;color:var(--accent);font-weight:700}
 
     .form-control:focus{box-shadow:none;border-color:var(--accent)}
@@ -57,34 +81,49 @@
     .icon-label{display:inline-flex;align-items:center;gap:8px}
     .icon-label i{font-size:18px;color:var(--accent)}
 
-    /* Card list for tasks */
     .upload-card{border-radius:12px;border:1px dashed rgba(46,125,50,.12);padding:12px}
     .thumbs{display:flex;gap:8px;flex-wrap:wrap}
-    .thumb{width:84px;height:84px;border-radius:8px;overflow:hidden;border:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;background:#fff}
+    .thumb{width:84px;height:84px;border-radius:8px;overflow:hidden;border:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;background:#fff;position:relative}
     .thumb img{width:100%;height:100%;object-fit:cover}
+
+    .plant-name-input{width:100%;margin-top:6px;font-size:13px;padding:6px;border-radius:6px;border:1px solid rgba(0,0,0,.08)}
 
     .btn-accent{background:var(--accent);border:none;color:#fff}
     .btn-accent:active,.btn-accent:focus{box-shadow:none}
 
-    .small-muted{font-size:13px;color:var(--muted)}
+    .small-muted{font-size:13px;color:var(--muted);}
 
-    /* responsive for small phones */
+    .thumb-wrap{display:flex;flex-direction:column;align-items:center;width:106px}
+
+    #downloadCertWrap{display:flex;gap:8px;align-items:center;margin-top:10px}
+
     @media (max-width:420px){
       .app-wrap{padding:0 6px}
+      .trust-title{font-size:16px}
     }
   </style>
 </head>
 <body>
 
   <div class="app-wrap">
+
+    <!-- Trust Header -->
+    <div class="trust-header">
+      <img id="trustLogoImg" src="https://uardt.org/wp-content/uploads/2025/01/uardtlogo_new.gif.webp" alt="UARDT Logo" class="trust-logo">
+      <div class="trust-title">Umar Alisha Rural Development Trust</div>
+      <div class="trust-slogan">Service to humanity is service to God</div>
+      <div class="trust-sub">My Life, My Breath</div>
+    </div>
+
+    <!-- App Card -->
     <div class="card card-app">
-      <div class="app-header d-flex align-items-center justify-content-between">
-        <div>
+      <div class="app-header">
+        <div class="header-title">
           <h5>My Plant, My Breath</h5>
           <p class="mb-0">Plant at least 3 — Share your plantation photos</p>
         </div>
-        <div class="text-end">
-          <button id="btnOpenProfile" class="btn btn-sm btn-light" title="Profile"><i class="fa-regular fa-user"></i></button>
+        <div class="header-logo">
+          <img src="https://uardt.org/wp-content/uploads/2025/01/uardtlogo_new.gif.webp" alt="logo" style="height:28px;object-fit:contain">
         </div>
       </div>
 
@@ -132,6 +171,7 @@
               <label class="icon-label small-muted"><i class="fa-solid fa-phone"></i> Mobile</label>
               <input type="tel" id="regMobile" class="form-control" placeholder="10 digit mobile" pattern="[0-9]{10}" required>
             </div>
+
             <div class="row">
               <div class="col-6 mb-2">
                 <label class="icon-label small-muted"><i class="fa-solid fa-house"></i> Village</label>
@@ -142,9 +182,22 @@
                 <input type="text" id="regPincode" class="form-control" placeholder="Pincode" pattern="[0-9]{6}" required>
               </div>
             </div>
-            <div class="mb-3">
+
+            <div class="mb-2">
               <label class="icon-label small-muted"><i class="fa-solid fa-flag"></i> State</label>
               <input type="text" id="regState" class="form-control" placeholder="State" required>
+            </div>
+
+            <!-- NEW: Qualification & Designation -->
+            <div class="row">
+              <div class="col-6 mb-2">
+                <label class="icon-label small-muted"><i class="fa-solid fa-graduation-cap"></i> Qualification</label>
+                <input type="text" id="regQualification" class="form-control" placeholder="Qualification (e.g. MSc, BA)">
+              </div>
+              <div class="col-6 mb-2">
+                <label class="icon-label small-muted"><i class="fa-solid fa-briefcase"></i> Designation</label>
+                <input type="text" id="regDesignation" class="form-control" placeholder="Designation (e.g. Farmer)">
+              </div>
             </div>
 
             <div class="d-grid gap-2">
@@ -161,6 +214,7 @@
             <div>
               <div id="dashName" style="font-weight:600"></div>
               <div class="small-muted" id="dashMobile"></div>
+              <div class="small-muted" id="dashQualDesg" style="font-size:12px;margin-top:4px"></div>
             </div>
             <div class="ms-auto text-end">
               <button id="btnLogout" class="btn btn-sm btn-light" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
@@ -172,7 +226,7 @@
               <div class="d-flex align-items-center justify-content-between mb-2">
                 <div>
                   <div style="font-weight:700">Upload Plantation Photos</div>
-                  <div class="small-muted">Take and upload 3 photos of your plantation</div>
+                  <div class="small-muted">Upload exactly 3 photos and add each plant's name</div>
                 </div>
                 <div class="small-muted" id="progressCount">0/3</div>
               </div>
@@ -186,10 +240,18 @@
               <div class="d-grid gap-2">
                 <button id="btnSubmitTask" class="btn btn-accent" disabled>Submit Task</button>
               </div>
+
+                  <div id="downloadCertWrap" style="display:none">
+                  <button id="btnDownloadCert" onclick="downloadCirtificate()" class="btn btn-outline-success btn-sm">
+                  Download Certificate (PDF)
+                  </button>
+                  <small class="small-muted">You can re-download after completion.</small>
+                  </div>
+
             </div>
           </div>
 
-          <div class="mt-2 small-muted">Tip: You can upload images from your phone camera or gallery. This is a static demo — images are stored in browser only.</div>
+          <div class="mt-2 small-muted">Tip: This is a static demo — images & data are stored in your browser.</div>
         </div>
 
       </div>
@@ -199,13 +261,14 @@
     <div class="text-center mt-3 small-muted">Demo build • No backend • LocalStorage saves demo user</div>
   </div>
 
-<script>
-  // Simple static demo logic using localStorage
-  const LS_USER_PREFIX = 'mpmb_user_';
-  const LS_LOGGED = 'mpmb_logged_mobile';
+
+  <script>
+  // jsPDF exposing
+  const { jsPDF } = window.jspdf;
+
+  const TRUST_LOGO_URL = 'https://uardt.org/wp-content/uploads/2025/01/uardtlogo_new.gif.webp';
 
   const $ = selector => document.querySelector(selector);
-  const $$ = selector => document.querySelectorAll(selector);
 
   // Elements
   const loginView = $('#loginView');
@@ -224,10 +287,13 @@
   const regPincode = $('#regPincode');
   const profilePic = $('#profilePic');
   const regAvatarPreview = $('#regAvatarPreview');
+  const regQualification = $('#regQualification');
+  const regDesignation = $('#regDesignation');
 
   const dashAvatar = $('#dashAvatar');
   const dashName = $('#dashName');
   const dashMobile = $('#dashMobile');
+  const dashQualDesg = $('#dashQualDesg');
   const btnLogout = $('#btnLogout');
 
   const plantFiles = $('#plantFiles');
@@ -238,7 +304,72 @@
   const btnOpenProfile = $('#btnOpenProfile');
   const loginAvatar = $('#loginAvatar');
 
-  // helper: read file as dataURL
+  const btnDownloadCert = $('#btnDownloadCert');
+  const downloadCertWrap = $('#downloadCertWrap');
+
+  // ---------------------------------------------------
+  // IndexedDB STORAGE
+  // ---------------------------------------------------
+  let db;
+  const DB_NAME = "MyPlantDB";
+  const STORE = "users";
+  const KEY_LOGGED = "loggedMobile";
+
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, 1);
+
+      req.onupgradeneeded = e => {
+        db = e.target.result;
+        if (!db.objectStoreNames.contains(STORE)) {
+          db.createObjectStore(STORE, { keyPath: "mobile" });
+        }
+      };
+
+      req.onsuccess = e => { db = e.target.result; resolve(db); };
+      req.onerror = e => reject(e.target.errorCode);
+    });
+  }
+
+  async function saveUser(user) {
+    await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, "readwrite");
+      tx.objectStore(STORE).put(user);
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => reject(false);
+    });
+  }
+
+  async function getUser(mobile) {
+    await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, "readonly");
+      const req = tx.objectStore(STORE).get(mobile);
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => reject(null);
+    });
+  }
+
+  function setLoggedMobile(mobile) {
+    localStorage.setItem(KEY_LOGGED, mobile);
+  }
+
+  function getLoggedMobile() {
+    return localStorage.getItem(KEY_LOGGED);
+  }
+
+  function clearLogged() {
+    localStorage.removeItem(KEY_LOGGED);
+  }
+
+  // ---------------------------------------------------
+  // Helpers
+  // ---------------------------------------------------
+  function showLogin(){ loginView.style.display=''; registerView.style.display='none'; dashboardView.style.display='none'; }
+  function showRegister(){ loginView.style.display='none'; registerView.style.display=''; dashboardView.style.display='none'; }
+  function showDashboard(){ loginView.style.display='none'; registerView.style.display='none'; dashboardView.style.display=''; }
+
   function fileToDataURL(file){
     return new Promise((res, rej) => {
       const fr = new FileReader();
@@ -248,37 +379,44 @@
     });
   }
 
-  // show view helpers
-  function showLogin(){ loginView.style.display=''; registerView.style.display='none'; dashboardView.style.display='none'; }
-  function showRegister(){ loginView.style.display='none'; registerView.style.display=''; dashboardView.style.display='none'; }
-  function showDashboard(){ loginView.style.display='none'; registerView.style.display='none'; dashboardView.style.display=''; }
+  async function getDataUrlFromUrl(url) {
+    try {
+      const res = await fetch(url, { mode: 'cors' });
+      const blob = await res.blob();
+      return await new Promise((resolve, reject) => {
+        const fr = new FileReader();
+        fr.onload = () => resolve(fr.result);
+        fr.onerror = () => reject('Failed convert logo');
+        fr.readAsDataURL(blob);
+      });
+    } catch (err) {
+      console.warn('Could not fetch logo as dataURL', err);
+      return null;
+    }
+  }
 
-  // Load user if logged
-  function getLoggedMobile(){ return localStorage.getItem(LS_LOGGED); }
-  function setLoggedMobile(mobile){ localStorage.setItem(LS_LOGGED, mobile); }
-  function clearLogged(){ localStorage.removeItem(LS_LOGGED); }
-
-  function saveUser(mobile, userObj){ localStorage.setItem(LS_USER_PREFIX + mobile, JSON.stringify(userObj)); }
-  function getUser(mobile){ const j = localStorage.getItem(LS_USER_PREFIX + mobile); return j? JSON.parse(j): null; }
-
+  // ---------------------------------------------------
   // Initialize
-  function init(){
+  // ---------------------------------------------------
+  async function init(){
     const logged = getLoggedMobile();
-    if(logged && getUser(logged)){
-      populateDashboard(logged);
+    if(logged && await getUser(logged)){
+      await populateDashboard(logged);
       showDashboard();
     } else showLogin();
   }
 
-  // Login form submit
-  loginForm.addEventListener('submit', (e) =>{
+  // ---------------------------------------------------
+  // Login
+  // ---------------------------------------------------
+  loginForm.addEventListener('submit', async (e) =>{
     e.preventDefault();
     const mobile = loginMobile.value.trim();
     if(!/^[0-9]{10}$/.test(mobile)){
       Swal.fire('Invalid','Enter a valid 10 digit mobile number','warning');
       return;
     }
-    const user = getUser(mobile);
+    const user = await getUser(mobile);
     if(!user){
       Swal.fire({
         title: 'Not registered',
@@ -290,16 +428,16 @@
       return;
     }
     setLoggedMobile(mobile);
-    populateDashboard(mobile);
+    await populateDashboard(mobile);
     showDashboard();
     Swal.fire({icon:'success',title:'Logged In',toast:true,position:'top-end',showConfirmButton:false,timer:1200});
   });
 
-  btnGoRegister.addEventListener('click', ()=>{
-    showRegister();
-  });
+  btnGoRegister.addEventListener('click', ()=> showRegister());
 
-  // Register image preview
+  // ---------------------------------------------------
+  // Register
+  // ---------------------------------------------------
   profilePic.addEventListener('change', async (ev)=>{
     const f = ev.target.files[0];
     if(!f) return;
@@ -308,7 +446,6 @@
     regAvatarPreview.innerHTML = '<img src="'+data+'" style="width:100%;height:100%;object-fit:cover">';
   });
 
-  // Register submit
   registerForm.addEventListener('submit', async (e)=>{
     e.preventDefault();
     const mobile = regMobile.value.trim();
@@ -316,32 +453,37 @@
       Swal.fire('Invalid','Enter a valid 10 digit mobile number','warning');
       return;
     }
+
     const user = {
       name: regName.value.trim(),
       mobile: mobile,
       village: regVillage.value.trim(),
       state: regState.value.trim(),
       pincode: regPincode.value.trim(),
-      profile: null,
-      tasks: []
+      qualification: regQualification.value.trim() || '',
+      designation: regDesignation.value.trim() || '',
+      profile: profilePic.files[0] ? await fileToDataURL(profilePic.files[0]) : null,
+      tasks: [],
+      completedAt: null
     };
-    if(profilePic.files && profilePic.files[0]){
-      try{ user.profile = await fileToDataURL(profilePic.files[0]); }catch(e){}
-    }
 
-    saveUser(mobile, user);
+    await saveUser(user);
     setLoggedMobile(mobile);
-    populateDashboard(mobile);
+    await populateDashboard(mobile);
     showDashboard();
     Swal.fire({icon:'success',title:'Registered',text:'You are now logged in',timer:1400,showConfirmButton:false});
   });
 
-  // populate dashboard values
-  function populateDashboard(mobile){
-    const user = getUser(mobile);
+  // ---------------------------------------------------
+  // Dashboard
+  // ---------------------------------------------------
+  async function populateDashboard(mobile){
+    const user = await getUser(mobile);
     if(!user) return;
     dashName.textContent = user.name || '—';
     dashMobile.textContent = user.mobile;
+    dashQualDesg.textContent = (user.qualification ? user.qualification + ' • ' : '') + (user.designation || '');
+
     if(user.profile){
       dashAvatar.innerHTML = '<img src="'+user.profile+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
       loginAvatar.innerHTML = '<img src="'+user.profile+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
@@ -350,82 +492,113 @@
       loginAvatar.innerHTML = '<div class="avatar-placeholder"><i class="fa-solid fa-seedling fa-2x"></i></div>';
     }
 
-    // load tasks
     renderThumbs(user.tasks || []);
+    updateCompletionUI(user);
   }
 
-  // logout
   btnLogout.addEventListener('click', ()=>{
     clearLogged();
     showLogin();
     Swal.fire({icon:'success',title:'Logged out',toast:true,position:'top-end',showConfirmButton:false,timer:900});
   });
 
-  // plant file change
+  // ---------------------------------------------------
+  // Plant uploads
+  // ---------------------------------------------------
   plantFiles.addEventListener('change', async (ev)=>{
     const files = Array.from(ev.target.files).filter(f=>f.type.startsWith('image/'));
     if(files.length === 0) return;
-    // limit total to 3 -- keep last 3
-    const mobile = getLoggedMobile(); if(!mobile) { Swal.fire('Login required','Please login first','warning'); return; }
-    const user = getUser(mobile) || {tasks:[]};
+    const mobile = getLoggedMobile(); 
+    if(!mobile) { Swal.fire('Login required','Please login first','warning'); return; }
+    const user = await getUser(mobile) || {tasks:[]};
 
-    // read files to data urls
     for(const f of files){
       if(user.tasks.length >= 3) break;
-      try{ const d = await fileToDataURL(f); user.tasks.push(d); }catch(e){}
+      try{
+        const d = await fileToDataURL(f);
+        user.tasks.push({ img: d, plantName: '' });
+      }catch(e){}
     }
-    // save
-    saveUser(mobile, user);
-    populateDashboard(mobile);
-    // reset input
+    await saveUser(user);
+    await populateDashboard(mobile);
     plantFiles.value = '';
-
-    if((user.tasks||[]).length >= 3) btnSubmitTask.disabled = false;
+    checkEnableSubmit();
   });
 
-  // render thumbs
   function renderThumbs(tasks){
     thumbsWrap.innerHTML = '';
-    const arr = tasks||[];
+    const arr = tasks || [];
     progressCount.textContent = `${arr.length}/3`;
-    arr.forEach((d,i)=>{
+
+    arr.forEach((task, i)=>{
+      const wrapper = document.createElement('div'); wrapper.className='thumb-wrap';
+
       const div = document.createElement('div'); div.className='thumb';
-      div.innerHTML = '<img src="'+d+'" alt="plant-'+(i+1)+'">';
-      // add remove button overlay
+      div.innerHTML = '<img src="'+task.img+'" alt="plant-'+(i+1)+'">';
+
       const rem = document.createElement('button');
       rem.className = 'btn btn-sm';
       rem.style.position='absolute'; rem.style.margin='-6px'; rem.style.right='4px'; rem.style.top='4px';
       rem.innerHTML = '<i class="fa-solid fa-xmark" style="font-size:12px;color:#fff"></i>';
       rem.style.background='rgba(0,0,0,.5)'; rem.style.border='none'; rem.style.borderRadius='50%';
       rem.title='Remove';
-      rem.addEventListener('click', ()=>{
-        const mobile = getLoggedMobile(); const user = getUser(mobile); if(!user) return;
-        user.tasks.splice(i,1); saveUser(mobile,user); populateDashboard(mobile);
+      rem.addEventListener('click', async ()=>{
+        const mobile = getLoggedMobile(); const user = await getUser(mobile); if(!user) return;
+        user.tasks.splice(i,1); await saveUser(user); await populateDashboard(mobile);
       });
-      const wrapper = document.createElement('div'); wrapper.style.position='relative'; wrapper.appendChild(div); wrapper.appendChild(rem);
+
+      div.appendChild(rem);
+
+      const input = document.createElement('input');
+      input.className = 'plant-name-input';
+      input.placeholder = 'Enter plant name';
+      input.value = task.plantName || '';
+      input.addEventListener('input', async (e)=>{
+        const mobile = getLoggedMobile(); const user = await getUser(mobile); if(!user) return;
+        if(!user.tasks[i]) return;
+        user.tasks[i].plantName = e.target.value;
+        await saveUser(user);
+        checkEnableSubmit();
+      });
+
+      wrapper.appendChild(div);
+      wrapper.appendChild(input);
       thumbsWrap.appendChild(wrapper);
     });
 
-    // if less than 3, show placeholders up to 3
     for(let i=arr.length;i<3;i++){
-      const ph = document.createElement('div'); ph.className='thumb'; ph.innerHTML = '<div style="font-size:22px;color:var(--muted)"><i class="fa-solid fa-image"></i></div>';
+      const ph = document.createElement('div'); ph.className='thumb-wrap';
+      const phThumb = document.createElement('div'); phThumb.className='thumb';
+      phThumb.innerHTML = '<div style="font-size:22px;color:var(--muted)"><i class="fa-solid fa-image"></i></div>';
+      const phInput = document.createElement('input'); phInput.className='plant-name-input'; phInput.placeholder='Empty slot';
+      phInput.disabled = true;
+      ph.appendChild(phThumb); ph.appendChild(phInput);
       thumbsWrap.appendChild(ph);
     }
 
-    btnSubmitTask.disabled = (arr.length < 3);
+    checkEnableSubmit();
   }
 
-  // submit task
-  btnSubmitTask.addEventListener('click', ()=>{
+  async function checkEnableSubmit(){
+    const mobile = getLoggedMobile(); if(!mobile){ btnSubmitTask.disabled = true; return; }
+    const user = await getUser(mobile); if(!user || !user.tasks) { btnSubmitTask.disabled = true; return; }
+    const arr = user.tasks;
+    const allNamed = arr.length === 3 && arr.every(t => t.plantName && t.plantName.trim().length > 0);
+    btnSubmitTask.disabled = !allNamed;
+  }
+
+  btnSubmitTask.addEventListener('click', async ()=>{
     const mobile = getLoggedMobile(); if(!mobile){ Swal.fire('Login required','Please login first','warning'); return; }
-    const user = getUser(mobile);
+    const user = await getUser(mobile);
     if(!user || (user.tasks||[]).length < 3){ Swal.fire('Incomplete','Please upload 3 photos before submitting','warning'); return; }
+    const allNamed = user.tasks.every(t => t.plantName && t.plantName.trim().length > 0);
+    if(!allNamed){ Swal.fire('Missing names','Please enter plant name for all 3 photos','warning'); return; }
 
-    // Mark as completed — we add a completed flag
     user.completedAt = new Date().toISOString();
-    saveUser(mobile,user);
+    await saveUser(user);
 
-    // Show congratulations popup with simple confetti effect via SweetAlert
+    updateCompletionUI(user);
+
     Swal.fire({
       title: 'Congratulations!',
       html: `<div style="font-weight:600;">Thank you ${user.name || ''} — You have submitted 3 plantation photos.</div><div class="small-muted mt-2">Keep planting & breathing.</div>`,
@@ -434,32 +607,220 @@
     });
   });
 
-  // Quick profile open button: opens register form prefilled with current user
-  btnOpenProfile.addEventListener('click', ()=>{
+  function updateCompletionUI(user){
+    if(user && user.completedAt){
+      downloadCertWrap.style.display = 'flex';
+      btnSubmitTask.style.display = 'none';
+    } else {
+      downloadCertWrap.style.display = 'none';
+      btnSubmitTask.style.display = '';
+    }
+    checkEnableSubmit();
+  }
+
+  // ---------------------------------------------------
+  // Profile Edit & Prefill
+  // ---------------------------------------------------
+  btnOpenProfile.addEventListener('click', async ()=>{
     const mobile = getLoggedMobile();
     if(!mobile){ showLogin(); return; }
-    const user = getUser(mobile);
+    const user = await getUser(mobile);
     showRegister();
-    // prefill
     regName.value = user.name || '';
     regMobile.value = user.mobile || '';
     regVillage.value = user.village || '';
     regState.value = user.state || '';
     regPincode.value = user.pincode || '';
+    regQualification.value = user.qualification || '';
+    regDesignation.value = user.designation || '';
     if(user.profile) regAvatarPreview.innerHTML = '<img src="'+user.profile+'" style="width:100%;height:100%;object-fit:cover">';
+    else regAvatarPreview.innerHTML = '<div class="avatar-placeholder">+</div>';
   });
 
-  // back to login
   $('#btnBackLogin').addEventListener('click', ()=>{ showLogin(); });
 
-  // small UX: if user enters mobile in register page, prefill name if exists
-  regMobile.addEventListener('blur', ()=>{
-    const u = getUser(regMobile.value.trim()); if(u){ regName.value = u.name || regName.value; regVillage.value = u.village || regVillage.value; regState.value = u.state || regState.value; regPincode.value = u.pincode || regPincode.value; if(u.profile) regAvatarPreview.innerHTML = '<img src="'+u.profile+'" style="width:100%;height:100%;object-fit:cover">'; }
+  regMobile.addEventListener('blur', async ()=>{
+    const u = await getUser(regMobile.value.trim());
+    if(u){
+      regName.value = u.name || regName.value;
+      regVillage.value = u.village || regVillage.value;
+      regState.value = u.state || regState.value;
+      regPincode.value = u.pincode || regPincode.value;
+      regQualification.value = u.qualification || regQualification.value;
+      regDesignation.value = u.designation || regDesignation.value;
+      if(u.profile) regAvatarPreview.innerHTML = '<img src="'+u.profile+'" style="width:100%;height:100%;object-fit:cover">';
+    }
   });
 
-  // init app
+  // ---------------------------------------------------
+  // Certificate
+  // ---------------------------------------------------
+ 
+  async function downloadCirtificate() {
+    const mobile = getLoggedMobile(); 
+    if(!mobile) {
+        Swal.fire('Login required','Please login first','warning');
+        return;
+    }
+
+    // Get user from IndexedDB
+    const user = await getUser(mobile);  
+    if(!user || !user.completedAt){
+        Swal.fire('Not completed','Complete the task before downloading the certificate','warning');
+        return;
+    }
+
+    try {
+        await generateCertificatePDF(user);
+    } catch(err) {
+        console.error(err);
+        Swal.fire('Error','Failed to generate certificate','error');
+    }
+}
+async function generateCertificatePDF(user){
+  const width = 792;  // 11 inch * 72pt
+  const height = 612; // 8.5 inch * 72pt
+  const margin = 30;
+  let y = margin;
+
+  const doc = new jsPDF({
+    orientation: 'landscape',
+    unit: 'pt',
+    format: [width, height]
+  });
+
+  // ---------------------------
+  // Load logo as DataURL (convert .webp to base64 PNG)
+  // ---------------------------
+  let logoData = null;
+  try {
+    logoData = await getDataUrlFromUrl('https://uardt.org/wp-content/uploads/2025/01/uardtlogo_new.gif.webp');
+  } catch(e) { console.warn('Logo load failed', e); }
+
+  // ---------------------------
+  // Add watermark logo
+  // ---------------------------
+  if(logoData){
+    doc.setGState(new doc.GState({ opacity: 0.08 })); // light watermark
+    const wmWidth = width * 0.6;
+    const wmHeight = wmWidth * 0.5; // adjust height manually if original not known
+    doc.addImage(logoData, 'PNG', (width - wmWidth)/2, (height - wmHeight)/2, wmWidth, wmHeight);
+    doc.setGState(new doc.GState({ opacity: 1 })); // reset opacity
+  }
+
+  // ---------------------------
+  // Draw border
+  // ---------------------------
+  doc.setDrawColor(0, 100, 0);
+  doc.setLineWidth(4);
+  doc.rect(10, 10, width-20, height-20);
+
+  // ---------------------------
+  // Main logo at top
+  // ---------------------------
+  if(logoData){
+    const logoW = 100;
+    const logoH = 50;
+    doc.addImage(logoData, 'PNG', (width - logoW)/2, y, logoW, logoH);
+    y += logoH + 15;
+  } else { y += 20; }
+
+  // ---------------------------
+  // Add certificate title and content as before
+  // ---------------------------
+  doc.setFontSize(22);
+  doc.setFont('Helvetica','bold');
+  doc.setTextColor(25,85,33);
+  doc.text('Umar Alisha Rural Development Trust', width/2, y, {align:'center'});
+  y += 28;
+
+  doc.setFontSize(12);
+  doc.setFont('Helvetica','normal');
+  doc.setTextColor(70,90,70);
+  doc.text('Service to humanity is service to God', width/2, y, {align:'center'});
+  y += 20;
+
+  doc.setFontSize(11);
+  doc.setTextColor(46,125,50);
+  doc.text('My Life, My Breath', width/2, y, {align:'center'});
+  y += 25;
+
+  doc.setDrawColor(180,205,180);
+  doc.setLineWidth(1);
+  doc.line(margin, y, width - margin, y);
+  y += 25;
+
+  doc.setFontSize(20);
+  doc.setFont('Helvetica','bold');
+  doc.setTextColor(31,87,36);
+  doc.text('Appreciation Certificate', width/2, y, {align:'center'});
+  y += 30;
+
+  doc.setFontSize(12);
+  doc.setFont('Helvetica','normal');
+  doc.setTextColor(0,0,0);
+  doc.text('This certificate is presented to', width/2, y, {align:'center'});
+  y += 25;
+
+  doc.setFontSize(26);
+  doc.setFont('Helvetica','bold');
+  doc.text(user.name || '-', width/2, y, {align:'center'});
+  y += 25;
+
+  const details = [user.qualification, user.designation, user.village].filter(Boolean).join(' • ');
+  if(details){
+    doc.setFontSize(12);
+    doc.setFont('Helvetica','normal');
+    doc.text(details, width/2, y, {align:'center'});
+    y += 20;
+  } else { y += 10; }
+
+  const message = 'In recognition of your participation in the "My Life, My Breath" plantation drive and for contributing to a greener future.';
+  doc.setFontSize(12);
+  doc.text(message, width/2, y, {align:'center', maxWidth: width - margin*2});
+  y += 40;
+
+  if(user.tasks && user.tasks.length){
+    doc.setFontSize(14);
+    doc.setFont('Helvetica','bold');
+    doc.text('Plants Submitted', margin, y);
+    y += 10;
+
+    const thumbW = 140, thumbH = 110;
+    let x = margin;
+    for(let i=0;i<Math.min(3,user.tasks.length);i++){
+      const t = user.tasks[i];
+      try{ doc.addImage(t.img,'JPEG',x,y,thumbW,thumbH); } 
+      catch(e){ try{ doc.addImage(t.img,'PNG',x,y,thumbW,thumbH); }catch(e2){} }
+      doc.setFontSize(11);
+      doc.setFont('Helvetica','normal');
+      doc.text(t.plantName||'—', x + thumbW/2, y + thumbH + 14, {align:'center'});
+      x += thumbW + 30;
+    }
+    y += thumbH + 40;
+  }
+
+  const dt = new Date(user.completedAt || new Date().toISOString());
+  const dateStr = dt.toLocaleDateString();
+  doc.setFontSize(12);
+  doc.text(`Date: ${dateStr}`, margin, height - 80);
+  doc.text('Authorized by: Umar Alisha Rural Development Trust', width - margin, height - 80, {align:'right'});
+
+  doc.setLineWidth(0.8);
+  doc.line(width - 220, height - 50, width - 60, height - 50);
+  doc.setFontSize(10);
+  doc.text('Signature', width - 140, height - 35, {align:'center'});
+
+  const filename = `UARDT_Certificate_${(user.name||'user').replace(/\s+/g,'_')}_${dateStr.replace(/\//g,'-')}.pdf`;
+  doc.save(filename);
+}
+
+  // ---------------------------------------------------
+  // Init
+  // ---------------------------------------------------
   init();
 </script>
+
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
